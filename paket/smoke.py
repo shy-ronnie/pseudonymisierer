@@ -2,6 +2,13 @@
 import json, os, re, subprocess, sys, tempfile, threading, time, urllib.request
 from pathlib import Path
 
+os.environ["PYTHONUTF8"] = "1"
+os.environ["PYTHONIOENCODING"] = "utf-8"
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 paket = Path(sys.argv[1]).resolve()
 app = paket / "app"
 py = sys.executable
