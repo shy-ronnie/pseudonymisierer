@@ -1,0 +1,29 @@
+name: Pakete bauen
+on:
+  workflow_dispatch: {}
+  push:
+    tags: ["v*"]
+jobs:
+  bauen:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Windows, os: windows-latest, triple: x86_64-pc-windows-msvc, cross: "" }
+          - { name: Mac-AppleSilicon, os: macos-14, triple: aarch64-apple-darwin, cross: "" }
+          - { name: Mac-Intel, os: macos-14, triple: x86_64-apple-darwin, cross: "--cross" }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Paket bauen und prüfen
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python paket/bauen.py --triple ${{ matrix.triple }} --name Pseudonymisierer-${{ matrix.name }} ${{ matrix.cross }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Pseudonymisierer-${{ matrix.name }}
+          path: dist/*.zip
+          retention-days: 30
